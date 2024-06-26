@@ -101,9 +101,14 @@ impl Server {
     }
 
     fn device_connect(data: &[u8], device_manager: Arc<Mutex<DeviceManager>>) {
-        let device_spec: DeviceSpec = serde_json::from_slice(data).unwrap();
-
-        let mut dm = device_manager.lock().unwrap();
-        dm.add_device(device_spec);
+        match serde_json::from_slice::<DeviceSpec>(data) {
+            Ok(device_spec) => {
+                let mut dm = device_manager.lock().unwrap();
+                dm.add_device(device_spec);
+            }
+            Err(e) => {
+                eprintln!("Failed to parse JSON: {:?}", e);
+            }
+        }
     }
 }

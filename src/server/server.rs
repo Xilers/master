@@ -7,9 +7,21 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 
 const HEADER_SIZE: usize = 5;
+
+#[derive(Debug)]
 enum Request {
     Connect,   // Get spec of device from client
     ListCheck, // Give Client DeviceSpec list
+}
+
+impl Request {
+    fn from_u8(value: u8) -> Option<Self> {
+        match value {
+            0 => Some(Request::Connect),
+            1 => Some(Request::ListCheck),
+            _ => None,
+        }
+    }
 }
 
 pub struct Server {
@@ -70,9 +82,14 @@ impl Server {
 
                     let data = &buffer[HEADER_SIZE..HEADER_SIZE + data_length];
 
-                    match request_type {
-                        Connect => Self::device_connect(&data, device_manager.clone()),
-                        ListCheck => {}
+                    match Request::from_u8(request_type) {
+                        Some(Request::Connect) => {
+                            Self::device_connect(&data, device_manager.clone())
+                        }
+                        Some(Request::ListCheck) => {}
+                        None => {
+                            eprintln!("Unknown request type");
+                        }
                     }
                 }
                 Err(_) => {

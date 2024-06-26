@@ -90,7 +90,7 @@ impl Server {
 
                     match Request::from_u8(request_type) {
                         Some(Request::Connect) => {
-                            Self::device_connect(&data, device_manager.clone())
+                            Self::device_connect(&data, device_manager.clone(), &stream);
                         }
                         Some(Request::ListCheck) => {}
                         None => {
@@ -106,12 +106,17 @@ impl Server {
         }
     }
 
-    fn device_connect(data: &[u8], device_manager: Arc<Mutex<DeviceManager>>) {
+    fn device_connect(data: &[u8], device_manager: Arc<Mutex<DeviceManager>>, stream: &TcpStream) {
         /*
          * Add Device Spec to DeviceManager (New device connect to server)
          */
         match serde_json::from_slice::<DeviceSpec>(data) {
             Ok(device_spec) => {
+                let mut device_spec = device_spec.clone();
+
+                device_spec.ip_addr = stream.peer_addr().unwrap().ip().to_string();
+                device_spec.port = stream.peer_addr().unwrap().port();
+
                 let mut dm = device_manager.lock().unwrap();
                 dm.add_device(device_spec);
             }

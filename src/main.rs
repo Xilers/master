@@ -1,9 +1,13 @@
 mod device;
+mod server;
 
-use device::manager::DeviceManager;
-use device::spec::DeviceSpec;
-use uuid::Uuid;
-
+use server::server::Server;
 fn main() {
-    println!("Test");
+    let server = Server::new("127.0.0.1", 7878);
+
+    let res = server.start();
+    match res {
+        Ok(_) => println!("Server started"),
+        Err(e) => eprintln!("Failed to start server: {}", e),
+    }
 }

@@ -2,7 +2,7 @@ use super::spec::DeviceSpec;
 
 use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DeviceManager {
     devices: HashMap<String, DeviceSpec>,
 }

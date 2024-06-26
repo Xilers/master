@@ -61,6 +61,12 @@ impl Server {
     }
 
     fn handle_client(mut stream: TcpStream, device_manager: Arc<Mutex<DeviceManager>>) {
+        /*
+         * Process request from client
+         * MSB
+         *  0: Connect
+         *  1: ListCheck
+         */
         let mut buffer = [0; 1024];
 
         loop {
@@ -101,6 +107,9 @@ impl Server {
     }
 
     fn device_connect(data: &[u8], device_manager: Arc<Mutex<DeviceManager>>) {
+        /*
+         * Add Device Spec to DeviceManager (New device connect to server)
+         */
         match serde_json::from_slice::<DeviceSpec>(data) {
             Ok(device_spec) => {
                 let mut dm = device_manager.lock().unwrap();
